@@ -29,70 +29,39 @@
                 paddingTop: getPaddingTop,
                 transform: `rotate(${(i * angle)+(angle/2)}deg)`}"
               >
-                <p
-                  class="gb-wheel-itext"
-                  :class="awards.length>6 &&'gb-wheel-stext'"
-                >{{data.prizeName}}</p>
+                <p class="gb-wheel-itext" :class="awards.length>6 &&'gb-wheel-stext'">{{data.text}}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="gb-wheel-btn"
-      @click="go"
-      v-if="!((wheelGameData.jifunNumber ===0 && wheelGameData.restNumber===0)
-      || wheelGameData.todayPlayedByTimesNumber >=wheelGameData.dailyLimit)"
-    >
+    <div class="gb-wheel-btn" @click="go">
       <img
         :src="require(`@/assets/${$global_config.platform_config.ASSET_PATH}/img/wheel/Free-Pointer.svg`)"
       />
     </div>
-    <goBtn
-      @go="go"
-      :rest-number="wheelGameData.restNumber"
-      :jifun-number="wheelGameData.jifunNumber"
-      :deduct-jifun="wheelGameData.deductJifun"
-      :today-played-by-times-number="wheelGameData.todayPlayedByTimesNumber"
-      :daily-limit="wheelGameData.dailyLimit"
-    />
+    <div class="gb-wheel-now" @click="go">
+      <div>立即抽奖</div>
+    </div>
   </section>
 </template>
 
 <script>
 
 export default {
-  props: {
-    isRun: {
-      type: Boolean,
-      default: false,
-    },
-    prizeDetail: {
-      type: Object,
-    },
-  },
   data() {
     return {
+      awards: [],
       i: 0,
+      angle: 0,
       gbWheelContent: '',
       isRes: false,
+      isRun: false,
       runAngle: 0,
-      PRIZE_ENUM: {
-        CHANGE: 409,
-      },
     };
   },
   computed: {
-    wheelGameData() {
-      return this.$store.state.wheelGameData;
-    },
-    type() {
-      return this.$store.state.wheelGameType;
-    },
-    awards() {
-      return this.wheelGameData.itemList;
-    },
     getPaddingTop() {
       let paddingTop = '1rem';
       switch (this.awards.length) {
@@ -116,85 +85,62 @@ export default {
       }
       return paddingTop;
     },
-    angle() {
-      return 360 / this.awards.length;
-    },
   },
   created() {
+    this.awards = [
+      { text: '耳机耳机耳机耳机耳机' },
+      { text: 'iPhone' },
+      { text: '存送優惠十字元50%' },
+      { text: '咖啡杯' },
+      { text: '日历日历日历日历日历' },
+      { text: '存送優惠十字元40%' },
+      { text: 'google' },
+      { text: 'yahoo' },
+      { text: '存送優惠十字元30%' },
+      { text: 'android' },
+    ];
+    this.angle = 360 / this.awards.length;
     this.gbWheelContent = `rotate(${this.angle / 2}deg)`;
   },
   methods: {
-    changeType() {
-      const { type } = this;
-      this.$store.commit('setWheelGameType');
-      setTimeout(async () => {
-        this.$api.actiList.initActivityLuckySpin({ body: type }, (res) => {
-          this.$store.commit('setWheelGameData', res.data);
-          this.$store.commit('setWheelGameType', type);
-        });
-      });
-    },
     go() {
       if (this.isRun) {
         return;
       }
-      this.$emit('onRun', true);
-      this.$api.actiList.checkBeforeGoActivityLuckySpin({ body: this.wheelGameData.id }, () => {
-        this.i += 1;
-        this.isRes = false;
-
-        this.runAngle += 360 * 10;
-        this.gbWheelContent = `rotate(${this.runAngle + (this.angle / 2)}deg)`;
-        setTimeout(() => {
-          this.$api.actiList.goActivityLuckySpin({ body: this.wheelGameData.id }, (res) => {
-            this.isRes = true;
-            const itemIndex = this.awards.findIndex((d) => d.prizeId === res.data.prizeId);
-            const itemAngle = 360 - this.angle * itemIndex;
-            this.gbWheelContent = `rotate(${itemAngle + this.runAngle - (this.angle / 2) + 1}deg)`;
-            setTimeout(() => {
-              this.$emit('onRun', false);
-              this.isRes = false;
-              this.$emit('onGetPrize', this.awards[itemIndex]);
-              this.$api.actiList.initActivityLuckySpin({ body: this.type }, (resSpin) => {
-                this.$store.commit('setWheelGameData', resSpin.data);
-              });
-            }, 6500);
-          }, (err) => {
-            setTimeout(() => {
-              this.$emit('onRun', false);
-              this.isRes = false;
-              this.$commonFun.showConfirmDialog({
-                message: err.message,
-              });
-              this.$api.actiList.initActivityLuckySpin({ body: this.type }, (resSpin) => {
-                this.$store.commit('setWheelGameData', resSpin.data);
-              });
-            }, 16500);
-          });
-        }, 2500);
-      }, (err) => {
-        this.$emit('onRun', false);
-        if (err.code === this.PRIZE_ENUM.CHANGE) {
-          this.$commonFun.showConfirmDialog({
-            title: err.message,
-            confirm: () => {
-              this.changeType();
-            },
-          });
+      this.i += 1;
+      this.isRes = false;
+      this.isRun = true;
+      this.runAngle += 360 * 10;
+      this.gbWheelContent = `rotate(${this.runAngle}deg)`;
+      setTimeout(() => {
+        // eslint-disable-next-line no-constant-condition
+        if (true) {
+          this.isRes = true;
+          const randomItem = Math.floor(Math.random() * this.awards.length);
+          const itemAngle = 360 - this.angle * randomItem;
+          this.gbWheelContent = `rotate(${itemAngle + this.runAngle - (this.angle / 2)}deg)`;
+          setTimeout(() => {
+            this.$commonFun.showConfirmSuccessDialog({
+              message: `恭喜抽到${this.awards[randomItem].text}`,
+            });
+            this.isRun = false;
+            this.isRes = false;
+          }, 6500);
         } else {
-          this.$commonFun.showErrorMessageDialog(err.message);
+          this.$commonFun.showConfirmDialog({
+            message: '請稍後在試',
+          });
+          this.isRun = false;
+          this.isRes = false;
         }
-      });
+      }, 4000);
     },
-  },
-  components: {
-    goBtn: (goBtn) => { require(['@/components/wheelGame/goBtn.vue'], goBtn); },
   },
 };
 
 </script>
 
-<style scoped>
+<style>
 .gb-wheel-container p {
   margin: 0;
   padding: 0;
@@ -326,7 +272,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  writing-mode: vertical-rl;
+  writing-mode: vertical-lr;
 }
 
 .gb-wheel-stext{
@@ -355,11 +301,32 @@ export default {
   width: initial;
 }
 
+.gb-wheel-now {
+  position: absolute;
+  width: 144Px;
+  height: 48Px;
+  cursor: pointer;
+  background: transparent linear-gradient(0deg, #bf2621 0%, #eb524d 100%) 0% 0%
+    no-repeat padding-box;
+  box-shadow: -1px -1px 2px #ffffff80;
+  border-radius: 27px;
+  bottom: -1Px;
+  right: 95Px;
+  z-index: 2;
+}
+
+.gb-wheel-now div {
+  padding: 12Px 32Px;
+  letter-spacing: 1.8Px;
+  color: #ffffff;
+  font-size: 18Px;
+}
+
 .gb-wheel-run {
   transition: transform 6s ease-out;
 }
 
 .gb-wheel-run-before {
-  transition: transform 20s ease;
+  transition: transform 30s ease;
 }
 </style>
