@@ -36,7 +36,7 @@ import {
 let awards: any[] = [];
 let isRun = false;
 let runAngle = -90;
-const settingAwards = ref('');
+const settingAwards = ref('hi\nhello\nthank you\nok');
 
 const angle = ref(0);
 const gbWheelContent = ref('');
