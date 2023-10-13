@@ -1,10 +1,12 @@
 <template>
-  <div>
-    設定獎項
-    <input v-model="settingAwards" style="width:500px" />
-    <span style="color:white">請輸入 ex: Howard,Edward 用逗號隔開</span>
-    <button @click="setting()">設定獎項</button>
-
+  <div class="row">
+    <div>
+      <textarea v-model="settingAwards" />
+      <div style="margin-top: 12px;">
+        <span style="color:white; margin-right: 12px;">用Enter換行隔開獎項</span>
+        <button @click="setting()">設定獎項</button>
+      </div>
+    </div>
     <div class="gb-wheel-container">
 
       <div class="gb-wheel-content" :class="runCssName" :style="{
@@ -15,7 +17,7 @@
       </div>
 
       <div class="btnContainer" v-if="img">
-        <img class="pointer" src="../assets/img/wheel/Common-Pointer.svg" />
+        <img class="pointer" @click="go" src="../assets/img/wheel/Common-Pointer.svg" />
 
         <div class="gb-wheel-btn" @click="go">
           <img src="../assets/img/wheel/Free-Pointer.svg" />
@@ -36,7 +38,6 @@ let isRun = false;
 let runAngle = -90;
 const settingAwards = ref('');
 
-const step = ref(1);
 const angle = ref(0);
 const gbWheelContent = ref('');
 const img = ref('');
@@ -97,9 +98,8 @@ const genWheel = (tempAwards: any) => {
 };
 
 const setting = () => {
-  const tempAwards = settingAwards.value.split(',');
+  const tempAwards = settingAwards.value.split('\n');
 
-  step.value = 2;
   awards = tempAwards;
 
   angle.value = 360 / tempAwards.length;
@@ -144,11 +144,8 @@ $assetsPath: "../assets";
 }
 
 .gb-wheel-container {
-  margin: 0 auto;
   position: relative;
-  width: 340Px;
-  height: 416Px;
-  margin-top: 60px;
+  margin-left: 240px;
 }
 
 .gb-wheel-content {
@@ -246,5 +243,18 @@ $assetsPath: "../assets";
   position: absolute;
   left: -10px;
   top: -20px;
+  cursor: pointer;
+}
+
+textarea {
+  resize: none;
+  height: 350px;
+  width: 250px;
+  font-size: 20px;
+}
+
+.row {
+  display: flex;
+  padding: 60px;
 }
 </style>
