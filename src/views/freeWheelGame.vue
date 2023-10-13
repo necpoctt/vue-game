@@ -1,14 +1,13 @@
 <template>
   <div class="row">
-    <div>
+    <div class="headRow">
       <textarea v-model="settingAwards" />
-      <div style="margin-top: 12px;">
-        <span style="color:white; margin-right: 12px;">用Enter換行隔開獎項</span>
+      <div class="tip">
+        <span>用Enter換行隔開獎項</span>
         <button @click="setting()">設定獎項</button>
       </div>
     </div>
-    <div class="gb-wheel-container">
-
+    <div class="gb-wheel-container headRow">
       <div class="gb-wheel-content" :class="runCssName" :style="{
         backgroundImage:
           `url('${img}')`,
@@ -44,6 +43,8 @@ const img = ref('');
 
 const runCssName = ref('');
 
+const isDesktop = window.innerWidth > 600;
+
 const getRandomHexColor = () => {
   const r = Math.floor(Math.random() * 256); // 生成 0 到 255 之间的随机红色值
   const g = Math.floor(Math.random() * 256); // 生成 0 到 255 之间的随机绿色值
@@ -77,7 +78,7 @@ const drawSector = (i: number, ctx: any, sectors: any) => {
   ctx.rotate(ang + arc / 2);
   ctx.textAlign = 'right';
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 22px sans-serif';
+  ctx.font = isDesktop ? 'bold 22px sans-serif' : 'bold 16px sans-serif';
   ctx.fillText(sectors[i], rad - 10, 10);
   ctx.restore();
 };
@@ -85,8 +86,8 @@ const drawSector = (i: number, ctx: any, sectors: any) => {
 const genWheel = (tempAwards: any) => {
   const canvas = document.createElement('canvas');
   canvas.hidden = true;
-  canvas.width = 400;
-  canvas.height = 400;
+  canvas.width = isDesktop ? 400 : 300;
+  canvas.height = isDesktop ? 400 : 300;
 
   const context = canvas.getContext('2d');
 
@@ -132,6 +133,8 @@ const go = () => {
     }, 6500);
   }, 4000);
 };
+
+setting();
 
 </script>
 
@@ -248,13 +251,64 @@ $assetsPath: "../assets";
 
 textarea {
   resize: none;
-  height: 350px;
-  width: 250px;
+  height: 300px;
   font-size: 20px;
 }
 
 .row {
   display: flex;
   padding: 60px;
+}
+
+.tip {
+  margin-top: 12px;
+
+  span {
+    color: white;
+    margin-right: 12px;
+  }
+
+  button {
+    width: 100px;
+    height: 30px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .headRow {
+    width: 100%;
+  }
+
+  .gb-wheel-content {
+    width: 300Px;
+    height: 300Px;
+  }
+
+  .gb-wheel-light {
+    position: absolute;
+    width: 144Px;
+    height: 144Px;
+    top: 25Px;
+    left: 25Px;
+  }
+
+  .gb-wheel-container {
+    margin-left: 0px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+
+  .btnContainer {
+    left: 108Px;
+    top: 80Px;
+  }
+
+  .row {
+    padding: 20px;
+  }
 }
 </style>
