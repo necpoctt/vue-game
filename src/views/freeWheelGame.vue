@@ -299,7 +299,7 @@ textarea {
   .gb-wheel-container {
     margin-left: 0px;
     margin-top: 60px;
-    margin-bottom: 60px;
+    height: 50vh;
   }
 
   .btnContainer {
