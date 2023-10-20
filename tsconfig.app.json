@@ -10,6 +10,10 @@
   ],
   "compilerOptions": {
     "composite": true,
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
