@@ -19,4 +19,4 @@ npm run build
 
 ## demo wheelgame
 
-https://demohohw3.000webhostapp.com/
+https://chip-bet-board-xaom.vercel.app/
